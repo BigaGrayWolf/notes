@@ -2,27 +2,15 @@
 
 ##### 步骤一：构造流量数据（分为两个维度：正常用户|恶意用户，登陆成功|登陆失败）
 
-目前我想的是，通过两台虚拟机相互攻击，其中ubuntu系统中构建ssh_server,kali系统自带hydra和wireshark,采用python脚本控制进行数据收集。【可行性待验证】
-
-
+目前我想的是，通过两台虚拟机相互攻击，其中ubuntu系统中构建ssh_server,kali系统自带hydra和wireshark,采用python脚本控制进行数据收集。【可行性已验证】
 
 bug:kali使用ifconfig命令获取IP失败，并且无法上网
 
 解决方案：https://blog.csdn.net/D15993395520/article/details/104945487
 
-
-
-安装ssh-server:
-
-https://blog.csdn.net/jackghq/article/details/54974141
-
-
-
 ssh会限制用户的错误登陆次数（默认为3次），该方案可修改（因为）安全原因不做了
 
 http://blog.itpub.net/24376892/viewspace-675046/
-
-
 
 kali安装libpcap-dev失败
 
@@ -30,13 +18,13 @@ kali更换为国内源
 
 https://blog.csdn.net/weixin_43372529/article/details/103298291
 
-
-
 python pypcap库
 
 https://www.litreily.top/2018/12/31/pypcap-install/
 
+解决包依赖
 
+https://blog.csdn.net/u012308586/article/details/105225075
 
 ##### 步骤二：数据解析\提取特征
 
