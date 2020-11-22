@@ -6,6 +6,14 @@ https://blog.csdn.net/qq_18769269/article/details/80843810
 
 
 
+##### 查看所有index
+
+http://127.0.0.1:9200/_cat/indices?v
+
+
+
+
+
 #### bug解决
 
 **报错**：MaxDirectMemorySize may have been miscalculated due to JDK-8074459
