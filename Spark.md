@@ -1,4 +1,4 @@
-### Spark
+### Spark深度之眼课程
 
 
 
@@ -274,6 +274,37 @@ Standby Namenode:接收Datanode报告+与Namenode共享相关编辑日志，当n
 
 
 
+#### 分布式计算与Map Reduce
+
+##### 分布式计算重要特点
+
+可扩展、高性能、容错性好、可用性好
+
+##### Map Reduce
+
+分而治之
+
+Map 拆分初始任务
+
+Reduce 结果归纳
+
+Map和Reduce之间会存在Shuffling步骤（洗牌），对数据进行整理，例如排序。
+
+###### 系统架构
+
+Job Client: 用户编写的MapReduce 程序通过Job Client提交给JobTracker
+
+Job Tracer: 负责资源监控和作业调度，并监控所有TaskTracker与作业健康状况
+
+Task Tracer: 负责监控任务进度，并汇报给Job Tracer
+
+
+
+#### Spark生态系统
+
+基础层Spark Core、衍生层GraphX等
+
+抽象架构：构建DAG（有向无环图）
 
 
 
@@ -283,22 +314,15 @@ Standby Namenode:接收Datanode报告+与Namenode共享相关编辑日志，当n
 
 
 
+##### The Google File System论文解读
 
+摘要重点：
 
+特点：可扩展、分布式
 
+作用：为大的分布式数据交互作用提供文件系统
 
-
-
-
-
-
-
-
-
-
-
-
-
+优点：在便宜的硬件上运行且提供容错性，为大量的用户提供很好的性能
 
 
 
