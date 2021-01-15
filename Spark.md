@@ -300,6 +300,94 @@ Task Tracer: 负责监控任务进度，并汇报给Job Tracer
 
 
 
+### Hive
+
+关系式数据存储
+
+查询语言HQL
+
+数据存储HDFS/cloud FileSystem
+
+执行引擎Map Reduce
+
+##### 架构
+
+###### 客户端：
+
+Client CLI
+
+JDBC/ODBC
+
+Web UI
+
+Thrift
+
+###### 服务端：
+
+Driver:解析器、编译器、优化器、执行器->MapReduce任务
+
+Metastore:一个组件，提供元数据服务
+
+MapReduce:经过转换和优化，形成一个mapreduce任务，可以提交到Hadoop集群
+
+###### 存储层：
+
+HDFS for Storage
+
+可扩展
+
+#### Metastore
+
+Metadata DB
+
+Metastore 服务
+
+#### Hive特点
+
+可扩展
+
+关系式
+
+SQL语言为查询接口
+
+为OLAP设计(Online Analytical Processing)
+
+数据更新即使某个版本支持也非常不建议
+
+##### Hive数据单元
+
+###### Databases||Schema：
+
+命名空间的功能，防止名字重复
+
+权限控制
+
+###### Tables:
+
+内部表：数据和表的定义绑定
+
+外部表：数据和表的定义分开，删除表，数据仍然存在
+
+###### Views
+
+###### Columns
+
+###### Partitions:分区
+
+###### Buckets:桶
+
+
+
+
+
+
+
+
+
+
+
+
+
 #### Spark生态系统
 
 基础层Spark Core、衍生层GraphX等
