@@ -543,9 +543,366 @@ intersect
 
 minus
 
+### 视图
+
+#### 创建或修改视图
+
+```sql
+CREATE [OR REPLACE] [FORCE] VIEW view_name --OR REPLACE表示view已存在的话就替代
+--FORCE 表示subquery中不一定需要存在基表
+AS subquery
+[WITH CHECK OPTION]--设立一个带检查的视图，插入或修改的数据行必须满足视图定义的约束
+[WITH READ ONLY]--只读视图
+```
+
+#### 删除视图
+
+```sql
+drop view view_name
+```
+
+#### 复杂视图
+
+键保留表可以做修改，但其它表只能做查询。
+
+因为键保留表保留了原本表的主键，所以可以对应到特定的行数据上。
 
 
 
+### 物化视图
+
+#### 会建数据的副本，牺牲空间换取查询时间
+
+```sql
+CREATE METERIALIZED VIEW view_name
+[BUILD IMMEDIATE | BUILD DEFERRED]--是否创建后立即生成数据,默认 IMMEDIATE
+--DEFERRED 默认创建时没有数据，需要手动执行刷新
+REFRESH [FAST|COMPLETE|FORCE]--采取何种方式与基表保持同步,默认 FORCE，自动选择是增量更新还是完全更新
+--FAST:增量刷新的物化视图 前提1、是必须创建物化视图日志：记录基表发生了哪些变化，用这些记录去更新物化视图
+--2、创建物化视图的语句中，查询结果中必须有基表的唯一标识（对应日志）
+[
+    ON [COMMIT|DEMAND] | START WITH (START_TIME) NEXT (NEXT_TIME)
+    --ON COMMIT在基表做提交操作时更新视图
+    --ON DEMAND手动刷新，默认值
+]
+AS 
+SUBQUERY
+```
 
 
+
+#### 执行下列语句进行手动刷新
+
+```sql
+begin--PLSQL
+DBMS_MVIEW.refreash('物化视图名','C')--C指Complete 完全刷新
+end
+```
+
+#### 创建物化视图日志
+
+```sql
+create materialized view log on 表名 with rowid --根据rowid进行更新物化视图
+```
+
+### 序列
+
+```sql
+create sequence 序列名
+```
+
+在插入时：序列名.nextval 作为值进行插入，这是一个伪列
+
+当前值：序列名.currval
+
+#### 复杂序列
+
+```sql
+CREATE SEQUENCE sequence_name
+[INCREAMENT BY n] --递增的序列值是n,每次加n
+[START WITH n]
+[{MAXVALUE n | NOMAXVALUE}]--最大值
+[{MINVALUE n | NOMINVALUE}]
+[{CYCLE|NOCYCLE}] --循环|非循环
+[{CACHE n|NOCACHE}] --分配并存入内存中
+```
+
+#### 修改序列
+
+```sql
+ALTER SEQUENCE 序列名称 maxvalue 5000 cycle;
+```
+
+不能更改序列的START WITH参数
+
+#### 删除序列
+
+```sql
+DROP SEQUENCE 序列名称
+```
+
+### 同义词
+
+别名
+
+创建同义词
+
+```sql
+create [public] SYNONYM synoonym for object;--object表示表、视图、序列等我们要创建同义词对象的名称
+--public表示共有同义词，未隔离不同用户
+```
+
+### 索引
+
+#### 创建索引
+
+```sql
+CREATE [UNIQUE] INDEX 索引名 on 表名(列名);
+```
+
+在INDEX前加UNIQUE关键字-->唯一索引
+
+##### 复合索引
+
+```sql
+CREATE INDEX 索引名 on 表名(列名1，列名2);
+```
+
+#### 反向键索引
+
+当某个字段的值为连续增长的值-->建普通索引会是一棵歪脖子树
+
+为了随机化->转化成二进制以后再倒置，最后返回10进制
+
+```sql
+CREATE  INDEX 索引名 on 表名(列名) reverse;
+```
+
+#### 位图索引
+
+```sql
+CREATE bitmap index 索引名 on 表名(列名);
+```
+
+低基数（值是有限的）时适合建位图索引
+
+不能按范围查询
+
+
+
+### ORACLE编程
+
+#### PL/SQL
+
+基本语法结构
+
+```sql
+[declare 
+--声明变量
+]
+begin
+--代码逻辑
+[exception
+--异常处理
+]
+end;
+```
+
+##### 变量
+
+声明变量
+
+```
+变量名 类型(长度);
+```
+
+变量赋值
+
+```sql
+变量名:=变量值
+
+select ... into .... where ...
+```
+
+##### 属性类型
+
+###### 引用型 从数据库中提取列的类型
+
+```sql
+变量名 表名.列名%type
+```
+
+###### 记录型 把整个行的记录赋给变量
+
+```sql
+变量名 表名%rowtype
+--取出变量时
+变量名.列名
+```
+
+##### 异常
+
+```sql
+exception
+when 异常类型
+then
+逻辑处理
+```
+
+##### 条件判断
+
+```sql
+if then
+endif;
+
+if then 
+else
+endif;
+
+if then
+elsif
+else
+endif;
+```
+
+##### 循环
+
+###### 无条件循环
+
+```sql
+loop
+--循环语句 通过exit跳出循环
+end loop;
+```
+
+###### 有条件循环
+
+```sql
+while 条件 --条件成立，则循环
+loop
+
+end loop;
+```
+
+###### for循环
+
+```sql
+for 变量 in 1...100 --变量从1到100
+loop
+end loop;
+```
+
+##### 游标
+
+存放查询结果的结果集
+
+###### 在声明区声明游标
+
+```sql
+cursor 游标名称 is SQL语句;
+```
+
+###### 使用游标语法
+
+```sql
+open 游标名称
+loop
+   fetch 游标名称 into 变量
+   exit when 游标名称%notfound
+end loop;
+close 游标名称
+```
+
+###### 带参数的游标
+
+```sql
+cursor 游标名称(参数名 类型) is SQL语句;--SQL语句带有未定参数
+```
+
+###### for循环游标
+
+```sql
+for 变量 in 游标名称[(参数值)]--参数项可选
+loop
+执行代码
+end loop;
+```
+
+##### 存储函数
+
+```sql
+CREATE [OR REPLACE] FUNCTION 函数名称
+(参数名称 类型,参数名称 类型)--不写参数长度
+RETURN 结果变量数据类型
+IS
+变量声明
+BEGIN
+函数体
+END;
+```
+
+##### 存储过程
+
+可以返回多个值，通过传出参数来返回
+
+不能在select语句中调用，多数时被应用程序所调用
+
+```sql
+CREATE [OR REPLACE] PROCEDURE 存储过程名称
+(参数名 类型，参数名 类型，参数名 类型)--参数只指定类型，不指定长度
+IS|AS
+变量声明
+BEGIN
+逻辑部分
+[EXCEPTION
+异常处理部分
+]
+END;
+--参数模式 IN ||OUT  ||IN OUT 在参数类型前加
+
+```
+
+调用
+
+```sql
+call 存储过程名称(); --不带传出参数
+
+--带传出参数
+declare
+   v_id number;
+begin
+存储过程名称(v_id); --执行完毕后v_id就有值了
+end;
+```
+
+##### 触发器
+
+###### 应用
+
+数据确认
+
+复杂的安全性检查
+
+做审计，跟踪表上所作的数据操作
+
+数据的备份与同步
+
+###### 触发器语法
+
+```sql
+CREATE [OR REPLACE] TRIGGER 触发器名
+BEFORE | AFTER --前置触发器or后置触发器，commit前触发还是commit后触发
+[DELETE][[OR] INSERT][[OR]UPDATE [OF 列名]]
+ON 表名
+[FOR EACH ROW][WHEN(条件)]--是否为行级触发器
+declare 
+...
+begin
+...
+end;
+```
+
+伪记录变量
+
+:old,:new 
 
