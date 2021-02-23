@@ -153,19 +153,125 @@ conn.rollback()
 
 #### 数据库连接池
 
+##### 好处
+
 提升性能
 
+用户访问高效
 
+##### 实现：
+
+标准接口：DataSource javax.sql包下
+
+方法：
+
+获取连接：getConnection()
+
+归还连接：如果连接对象Connection是从连接池中获取的，那么调用Connection.close()方法，则不会再关闭连接了，而是归还连接
+
+一般我们不去实现它，有数据库厂商来实现
+
+1、C3P0:数据库连接池技术
+
+2、Druid:数据库连接池技术，阿里巴巴
+
+#### C3P0:
+
+##### 步骤：
+
+导入jar包(不要忘记导入数据库驱动jar包)
+
+定义配置文件
+
+ 	名称：c3p0.properties 或者 c3p0-config.xml
+
+​	路径：直接放在src文件夹下即可
+
+创建核心对象 数据库连接池对象 ComboPooledDataSource//参数：使用特定名称的配置，若null，默认配置
+
+获取连接：getConnection
+
+#### Druid:
+
+##### 步骤：
+
+导入jar包
+
+定义配置文件
+
+ 	 是properties形式的
+
+​      可以叫任意名称，可以放在任意目录下
+
+加载配置文件
+
+```java
+Properties pro = new Properties();
+InputStream is = DruidDemo.class.getClassLoader().getResourceAsStream("druid.properties");
+pro.load(is);
+```
+
+获取数据库连接对象：通过工厂类来获取 DruidDataSourceFactory
+
+```java
+DataSource ds = DruidDataSourceFactory.createDataSource(pro);
+```
+
+获取连接 getConnection
+
+```java
+Connection conn = ds.getConnection();
+```
+
+##### 定义工具类：
+
+定义一个类JDBCUtils
+
+提供静态代码块加载配置文件，初始化连接池对象
+
+提供方法
+
+1、获取连接方法：通过数据库连接池获取连接
+
+2、释放资源
+
+3、获取连接池方法
 
 #### Spring JDBC:JDBC Template
 
+Spring框架对jdbc开发的简化：提供了一个JDBCTemplate对象
+
+步骤：
+
+1、导入jar包
+
+2、创建JDBCTemplate对象，依赖数据源DataSource
+
+```java
+JDBCTemplate template = new JDBCTemplate(ds);
+```
+
+3、调用JDBCTemplate的方法来完成CRUD操作
+
+```java
+update():执行DML语句，增、删、改
+queryForMap():查询结果将结果封装为map集合,字段名当作键，字段值当作值（单条记录）
+queryForList():查询结果将结果封装为list集合，查询多条记录，list的元素为map集合
+query():查询结果，将结果封装为JavaBean对象
+    方案一：第二个参数为RowMapper接口，实现一个mapRow方法完成封装
+    方案二：new BeanPropertyRowMapper(Emp.class)//Emp为对应的类，封装类型如Double\Integer可以接收NULL
+queryForObject():查询结果，将结果封装为对象//第二个参数为返回结果类型，如Long.class，一般用来执行聚合函数
+```
 
 
 
+#### Junit单元测试，可以让方法独立执行
 
+@Test
 
+public void test1(){
 
-
+}
 
 
 
